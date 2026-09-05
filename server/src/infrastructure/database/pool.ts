@@ -1,7 +1,11 @@
+// import "dotenv/config";
+// dotenv.config()
+
 import { Pool } from "pg";
 import { getUrls } from "../../config/urls.js";
 
-const {databaseUrl} = getUrls()
+const { databaseUrl } = getUrls();
+console.log("databaseUrl", databaseUrl);
 
 export const pool = new Pool({ connectionString: databaseUrl });
 

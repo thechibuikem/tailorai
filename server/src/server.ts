@@ -1,47 +1,23 @@
 import "dotenv/config";
 import express from "express";
-import { getUrls } from "./config/urls.js";
-import { connectDB } from "./infrastructure/database/pool.js";
-// import documentsRouter from "./modules/documents/documents.routes.js";
-// import jobsRouter from "./modules/jobs/jobs.routes.js";
-
-// import { embedText, generateCompletion } from "./config/providers.js";
-
-// console.log("API key loaded:", Boolean(process.env.GOOGLE_API_KEY));
-// const embedding = await embedText("Node.js backend developer");
-// console.log("Embedding length:", embedding.length);
-
-// const response = await generateCompletion("Say hello in one sentence.");
-// console.log("LLM:", response);
-
-
-
+import cors from "cors";
+import { errorHandler } from "./middleware/errorHandler.js";
+import sessionsRoutes from "./modules/sessions/routes.js";
+import documentsRoutes from "./modules/ingestion/routes.js";
+import jobsRoutes from "./modules/jobs/routes.js";
+import retrievalRoutes from "./modules/retrieval/routes.js";
+import agentRoutes from "./modules/agents/routes.js";
 
 const app = express();
-const { backendUrl } = getUrls();
-const PORT = process.env.PORT;
+app.use(cors());
 app.use(express.json());
+app.get("/api/health", (_req, res) => res.status(200).json({ status: "ok" }));
+app.use("/api/sessions", sessionsRoutes);
+app.use("/api/documents", documentsRoutes);
+app.use("/api/jobs", jobsRoutes);
+app.use("/api/retrieval", retrievalRoutes);
+app.use("/api/agent", agentRoutes);
+app.use(errorHandler);
 
-// app.use("/api/documents", documentsRouter);
-// app.use("/api/jobs", jobsRouter);
-
-app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok" });
-});
-
-async function startServer() {
-  try {
-    await connectDB();
-
-    app.listen(PORT, () => {
-      console.log(`Server running on port:${backendUrl}`);
-    });
-  } catch (err) {
-    console.error("Startup failed:", err);
-  }
-}
-
-await startServer();
-
-
-
+const port = process.env.PORT || 4000;
+app.listen(port, () => console.log(`cvforge server on :${port}`));
